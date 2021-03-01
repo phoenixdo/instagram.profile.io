@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>
+            Phoenix Do
+        </title>
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com">
+        <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+        
+        <script>
+            
+            /* Variables */
+            
+            // HTTP Request
+            const myRequest = new Request('https://jsonplaceholder.typicode.com/photos?albumId=3');
+            
+            // Dynamic Sorting (compareValues)
+            let imageArray = new Array();
+            let imageLimit = 10 // Limits images
+            let imageFilter = "title" // Parameter for sorting JSON objects
+            let startIndex = 0; // Starting point in Array
+            
+            // Create Components
+            var images;
+            var captons;
+            var links;
+            var count;
+            
+            /* Functions */
+            
+            fetch(myRequest)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("HTTP Error: Status = " + response.status);
+                    }
+                    
+                    return response.json();
+                })
+                .then(json => appendJson(json))
+            // END OF HTTP Request - Handles JSON
+        
+            function appendJson(json) {
+                
+                imageArray = json.slice(startIndex, imageLimit).sort(compareValues(imageFilter)); // Slices data, limits 10, A-Z order
+                createComponents(imageArray);
+                console.log(imageArray)
+            
+            } // END OF appendJson - Main function to display JSON
+    
+            function compareValues(key, order = 'asc') {
+              return function innerSort(a, b) {
+                  
+                if (!a.hasOwnProperty(key) || !b.hasOwnProperty(key)) {
+                  // Property doesn't exist on either object
+                  return 0;
+                }
+
+                // Standardizes keys
+                const varA = (typeof a[key] === 'string')
+                  ? a[key].toUpperCase() : a[key];
+                const varB = (typeof b[key] === 'string')
+                  ? b[key].toUpperCase() : b[key];
+                  
+                // Base for comparison is 0
+                let comparison = 0;
+                if (varA > varB) {
+                  comparison = 1;
+                } else if (varA < varB) {
+                  comparison = -1;
+                }
+                
+                return (
+                  (order === 'desc') ? (comparison * -1) : comparison
+                );
+              };
+            } // END OF compareValues- Takes in key and allows to determine ascending/descending order
+        
+            function createComponents(data) {
+                
+                for (i = 0; i <= 9; i++) {
+                
+                  images = '<img src ="' + data[i].thumbnailUrl + '" class="gallery-image" alt="hello">';
+                  captions = '<div class="top-left"> Album: ' + data[i].albumId + '</div>' + '<div class="centered"> Title: ' + data[i].title + '</div>';
+                  links = '<a href="' + data[i].url + '" target="_blank"> View More </a>';
+                
+                  document.getElementById("image" + [i]).innerHTML = images;
+                  document.getElementById("caption" + [i]).innerHTML = captions;
+                  document.getElementById("link" + [i]).innerHTML = links;
+                }
+                
+                count = '<span class="profile-stat-count">' + data.length + '</span>';
+                
+                document.getElementById("count").innerHTML = count;
+                
+            } // END OF createImageComponent - Processes images
+        
+        </script>
+        
+        <style>
+            
+            /* Base Styles */
+
+            :root {
+                font-size: 10px;
+            }
+
+            *,
+            *::before,
+            *::after {
+                box-sizing: border-box;
+            }
+
+            body {
+                min-height: 100vh;
+                background-color: #fafafa;
+                color: #262626;
+                padding-bottom: 3rem;
+            }
+        
+            footer {
+              padding: 1rem 0;
+              text-align: center;
+              font-size: 1.5rem;
+            }
+        
+            img {
+                display: block;
+            }
+        
+            .title {
+              font-size: 2rem;
+              line-height: 1;
+              padding-top: 2rem;
+              text-rendering: optimizeLegibility;
+            }
+
+            .container {
+                max-width: 93.5rem;
+                margin: 0 auto;
+                padding: 0 2rem;
+                font-family: 'Poppins', sans-serif;
+            }
+
+            .btn {
+                display: inline-block;
+                font: inherit;
+                background: none;
+                border: none;
+                color: inherit;
+                padding: 0;
+                cursor: pointer;
+            }
+
+            .btn:focus {
+                outline: 0.5rem auto #4d90fe;
+            }
+
+            .visually-hidden {
+                position: absolute !important;
+                height: 1px;
+                width: 1px;
+                overflow: hidden;
+                clip: rect(1px, 1px, 1px, 1px);
+            }
+        
+            .centered {
+              position: absolute;
+              top: 75%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              font-size: 1.5rem;
+            }
+        
+            .top-left {
+              position: absolute;
+              top: 8px;
+              left: 16px;
+              font-size: 1.5rem;
+            }
+        
+            a:link {
+              color: white;
+              background-color: transparent;
+              text-decoration: none;
+            }
+        
+            a:visited {
+              color: white;
+              background-color: transparent;
+              text-decoration: none;
+            }
+        
+            a:hover {
+              color: white;
+              background-color: transparent;
+              text-decoration: none;
+            }
+        
+            a:active {
+              color: black;
+              background-color: transparent;
+              text-decoration: none;
+            }
+
+            /* Profile Section */
+
+            .profile {
+                padding: 5rem 0;
+            }
+
+            .profile::after {
+                content: "";
+                display: block;
+                clear: both;
+            }
+
+            .profile-image {
+                float: left;
+                width: calc(33.333% - 1rem);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                margin-right: 3rem;
+            }
+            .profile-image img {
+                border-radius: 50%;
+                width: 16rem;
+            }
+
+            .profile-user-settings,
+            .profile-stats,
+            .profile-bio {
+                float: left;
+                width: calc(66.666% - 2rem);
+            }
+
+            .profile-user-settings {
+                margin-top: 1.1rem;
+            }
+
+            .profile-user-name {
+                display: inline-block;
+                font-size: 3.2rem;
+                font-weight: 300;
+            }
+
+            .profile-edit-btn {
+                font-size: 1.4rem;
+                line-height: 1.8;
+                border: 0.1rem solid #dbdbdb;
+                border-radius: 0.3rem;
+                padding: 0 2.4rem;
+                margin-left: 2rem;
+            }
+
+            .profile-settings-btn {
+                font-size: 2rem;
+                margin-left: 1rem;
+            }
+
+            .profile-stats {
+                margin-top: 2.3rem;
+            }
+        
+            .profile-stats ul {
+                padding: 0;
+            }
+
+            .profile-stats li {
+                display: inline-block;
+                font-size: 1.6rem;
+                line-height: 1.5;
+                margin-right: 4rem;
+                cursor: pointer;
+            }
+
+            .profile-stats li:last-of-type {
+                margin-right: 0;
+            }
+
+            .profile-bio {
+                font-size: 1.6rem;
+                font-weight: 400;
+                line-height: 1.5;
+                margin-top: 2.3rem;
+            }
+
+            .profile-real-name,
+            .profile-stat-count,
+            .profile-edit-btn {
+                font-weight: 1000;
+            }
+
+            /* Gallery Section */
+
+            .gallery {
+                display: flex;
+                flex-wrap: wrap;
+                margin: -1rem -1rem;
+                padding-bottom: 3rem;
+            }
+
+            .gallery-item {
+                position: relative;
+                flex: 1 0 22rem;
+                margin: 1rem;
+                color: #fff;
+                cursor: pointer;
+                width: 300px;
+            }
+
+            .gallery-item:hover .gallery-item-info,
+            .gallery-item:focus .gallery-item-info {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                position: absolute;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0, 0, 0, 0.3);
+            }
+
+            .gallery-item-info {
+                display: none;
+            }
+        
+            .gallery-item-info ul {
+                padding: 0;
+            }
+
+            .gallery-item-info li {
+                display: inline-block;
+                font-size: 1.7rem;
+                font-weight: 600;
+            }
+
+            .gallery-item-likes {
+                margin-right: 0rem;
+            }
+
+            .gallery-item-type {
+                position: absolute;
+                top: 1rem;
+                right: 1rem;
+                font-size: 2.5rem;
+                text-shadow: 0.2rem 0.2rem 0.2rem rgba(0, 0, 0, 0.1);
+            }
+
+            .fa-clone,
+            .fa-comment {
+                transform: rotateY(180deg);
+            }
+
+            .gallery-image {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+        
+            /* Media Query - If screen is below a certain size */
+
+            @media screen and (max-width: 40rem) {
+                .profile {
+                    display: flex;
+                    flex-wrap: wrap;
+                    padding: 4rem 0;
+                }
+
+                .profile::after {
+                    display: none;
+                }
+
+                .profile-image,
+                .profile-user-settings,
+                .profile-bio,
+                .profile-stats {
+                    float: none;
+                    width: auto;
+                }
+
+                .profile-image img {
+                    width: 7.7rem;
+                }
+
+                .profile-user-settings {
+                    flex-basis: calc(100% - 10.7rem);
+                    display: flex;
+                    flex-wrap: wrap;
+                    margin-top: 1rem;
+                }
+
+                .profile-user-name {
+                    font-size: 2.2rem;
+                }
+
+                .profile-edit-btn {
+                    order: 1;
+                    padding: 0;
+                    text-align: center;
+                    margin-top: 1rem;
+                }
+
+                .profile-edit-btn {
+                    margin-left: 0;
+                }
+
+                .profile-bio {
+                    font-size: 1.4rem;
+                    margin-top: 1.5rem;
+                }
+
+                .profile-edit-btn,
+                .profile-bio,
+                .profile-stats {
+                    flex-basis: 100%;
+                }
+
+                .profile-stats {
+                    order: 1;
+                    margin-top: 1.5rem;
+                }
+
+                .profile-stats ul {
+                    display: flex;
+                    text-align: center;
+                    padding: 1.2rem 0;
+                    border-top: 0.1rem solid #dadada;
+                    border-bottom: 0.1rem solid #dadada;
+                }
+
+                .profile-stats li {
+                    font-size: 1.4rem;
+                    flex: 1;
+                    margin: 0;
+                }
+
+                .profile-stat-count {
+                    display: block;
+                }
+            }
+
+        /*
+         
+         The following code will only run if your browser supports CSS grid.
+         
+         Remove or comment-out the code block below to see how the browser will fall-back to flexbox & floated styling.
+         
+         */
+
+            @supports (display: grid) {
+                .profile {
+                    display: grid;
+                    grid-template-columns: 1fr 2fr;
+                    grid-template-rows: repeat(3, auto);
+                    grid-column-gap: 3rem;
+                    align-items: center;
+                }
+
+                .profile-image {
+                    grid-row: 1 / -1;
+                }
+
+                .gallery {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+                    grid-gap: 2rem;
+                }
+
+                .profile-image,
+                .profile-user-settings,
+                .profile-stats,
+                .profile-bio,
+                .gallery-item,
+                .gallery {
+                    width: auto;
+                    margin: 0;
+                }
+
+                @media (max-width: 40rem) {
+                    .profile {
+                        grid-template-columns: auto 1fr;
+                        grid-row-gap: 1.5rem;
+                    }
+
+                    .profile-image {
+                        grid-row: 1 / 2;
+                    }
+
+                    .profile-user-settings {
+                        display: grid;
+                        grid-template-columns: auto 1fr;
+                        grid-gap: 1rem;
+                    }
+
+                    .profile-edit-btn,
+                    .profile-stats,
+                    .profile-bio {
+                        grid-column: 1 / -1;
+                    }
+
+                    .profile-user-settings,
+                    .profile-edit-btn,
+                    .profile-settings-btn,
+                    .profile-bio,
+                    .profile-stats {
+                        margin: 0;
+                    }
+                }
+            }
+        
+        </style>
+    </head>
+    
+    <body>
+        <header>
+
+            <div class="container">
+                
+                <div class="title"> The Modus Gallery </div>
+
+                <div class="profile">
+
+                    <div class="profile-image">
+
+                        <img src="https://media-exp1.licdn.com/dms/image/C5603AQFbpKUDF4V2Vw/profile-displayphoto-shrink_800_800/0/1568214657344?e=1617840000&v=beta&t=kQEqeVeGfAsqt80onL-rkTtseuAzdDOB9Q4Bx1060jY" alt="">
+
+                    </div>
+
+                    <div class="profile-user-settings">
+
+                        <h1 class="profile-user-name">phoenixdo777</h1>
+
+                        <button class="btn profile-edit-btn"> Modus Create </button>
+                    
+                    </div>
+
+                    <div class="profile-stats">
+
+                        <ul>
+                            <li><span id="count"></span> posts</li>
+                            <li><span class="profile-stat-count">2021</span> followers</li>
+                            <li><span class="profile-stat-count">1789</span> following</li>
+                        </ul>
+
+                    </div>
+
+                    <div class="profile-bio">
+
+                        <p><span class="profile-real-name">Phoenix Do</span> A Future Modite </p>
+
+                    </div>
+
+                </div>
+                <!-- End of profile section -->
+
+            </div>
+            <!-- End of container -->
+
+        </header>
+        <!-- End of header -->
+
+        <main>
+            
+            <div class="container">
+
+                <div class="gallery">
+
+                    <div class="gallery-item" tabindex="0">
+
+                        <div id="image0"> </div>
+                        
+                        <div class="gallery-item-info">
+
+                            <ul>
+                                <li> <div id="link0"> </div> </li>
+                            </ul>
+
+                        </div>
+                        
+                        <div id="caption0"> </div>
+                        
+                    </div>
+                    
+                    <div class="gallery-item" tabindex="0">
+
+                        <div id="image1"> </div>
+                        
+                        <div id="caption1"> </div>
+
+                        <div class="gallery-item-info">
+
+                            <ul>
+                                <li> <div id="link1"> </div> </li>
+                            </ul>
+
+                        </div>
+                        
+                        <div id="caption1"> </div>
+
+                    </div>
+
+                    <div class="gallery-item" tabindex="0">
+
+                        <div id="image2"> </div>
+
+                        <div class="gallery-item-info">
+
+                            <ul>
+                                <li> <div id="link2"> </div> </li>
+                            </ul>
+
+                        </div>
+                        
+                        <div id="caption2"> </div>
+
+                    </div>
+
+                    <div class="gallery-item" tabindex="0">
+
+                        <div id="image3"> </div>
+
+                        <div class="gallery-item-info">
+
+                            <ul>
+                                <li> <div id="link3"> </div> </li>
+                            </ul>
+
+                        </div>
+                        
+                        <div id="caption3"> </div>
+
+                    </div>
+
+                    <div class="gallery-item" tabindex="0">
+
+                        <div id="image4"> </div>
+
+                        <div class="gallery-item-info">
+
+                            <ul>
+                                <li> <div id="link4"> </div> </li>
+                            </ul>
+
+                        </div>
+                        
+                        <div id="caption4"> </div>
+
+                    </div>
+
+                    <div class="gallery-item" tabindex="0">
+
+                        <div id="image5"> </div>
+
+                        <div class="gallery-item-info">
+
+                            <ul>
+                                <li> <div id="link5"> </div> </li>
+                            </ul>
+
+                        </div>
+                        
+                        <div id="caption5"> </div>
+
+                    </div>
+
+                    <div class="gallery-item" tabindex="0">
+
+                        <div id="image6"> </div>
+
+                        <div class="gallery-item-info">
+
+                            <ul>
+                                <li> <div id="link6"> </div> </li>
+                            </ul>
+
+                        </div>
+                        
+                        <div id="caption6"> </div>
+
+                    </div>
+
+                    <div class="gallery-item" tabindex="0">
+
+                        <div id="image7"> </div>
+
+                        <div class="gallery-item-info">
+
+                            <ul>
+                                <li> <div id="link7"> </div> </li>
+                            </ul>
+
+                        </div>
+                        
+                        <div id="caption7"> </div>
+
+                    </div>
+
+                    <div class="gallery-item" tabindex="0">
+
+                        <div id="image8"> </div>
+
+                        <div class="gallery-item-info">
+
+                            <ul>
+                                <li> <div id="link8"> </div> </li>
+                            </ul>
+
+                        </div>
+                        
+                        <div id="caption8"> </div>
+
+                    </div>
+
+                    <div class="gallery-item" tabindex="0">
+
+                        <div id="image9"> </div>
+
+                        <div class="gallery-item-info">
+
+                            <ul>
+                                <li> <div id="link9"> </div> </li>
+                            </ul>
+
+                        </div>
+                        
+                        <div id="caption9"> </div>
+
+                    </div>
+
+                </div>
+                <!-- End of gallery -->
+                
+                <footer>
+                    
+                  <div>
+                      
+                      <p>&copy; Copyright 2021 Phoenix Do</p>
+
+                  </div>
+                  
+                </footer>
+                <!-- End of footer -->
+
+            </div>
+            <!-- End of container -->
+
+        </main>
+        <!-- End of main -->
+        
+    </body>
+    <!-- End of body -->
+    
+</html>
